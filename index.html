@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0B0907">
+  <title>Snake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #0B0907;
+      --char: #15110E;
+      --soot: #1E1915;
+      --seam: #2C2520;
+      --bone: #F5F0EA;
+      --ash: #A69C92;
+      --flare: #FF6A13;
+      --flare-hot: #FF8A3D;
+      --flare-deep: #C94A06;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    ::selection { background: var(--flare); color: var(--void); }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--void);
+      color: var(--bone);
+      font-family: Geist, system-ui, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      overscroll-behavior: none;
+    }
+
+    main {
+      /* Board stays square and always fits the screen, header and hint included. */
+      width: min(100%, 480px, calc(100dvh - 190px));
+      min-width: 240px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .scores { display: flex; gap: 24px; margin: 0; }
+    .scores div { text-align: right; }
+
+    dt {
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ash);
+    }
+
+    dd {
+      margin: 4px 0 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .board {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--char);
+      border: 1px solid var(--seam);
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 240, 225, 0.04);
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    canvas { display: block; width: 100%; height: 100%; }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      background: rgba(11, 9, 7, 0.72);
+      transition: opacity 200ms var(--ease-out);
+    }
+
+    .overlay[hidden] { display: none; }
+
+    .overlay p {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .overlay p:empty { display: none; }
+
+    button {
+      height: 44px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--flare);
+      color: var(--void);
+      font: 600 1.125rem/1 Geist, system-ui, sans-serif;
+      letter-spacing: -0.015em;
+      cursor: pointer;
+      box-shadow: 0 10px 24px -10px rgba(255, 106, 19, 0.6);
+      transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out);
+    }
+
+    @media (hover: hover) {
+      button:hover { background: var(--flare-hot); }
+    }
+
+    button:active { background: var(--flare-deep); transform: scale(0.97); }
+
+    button:focus-visible { outline: 2px solid var(--flare); outline-offset: 3px; }
+
+    .hint {
+      margin: 16px 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--ash);
+    }
+
+    .hint-touch { display: none; }
+
+    @media (pointer: coarse) {
+      .hint-keys { display: none; }
+      .hint-touch { display: inline; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .overlay, button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Snake</h1>
+      <dl class="scores">
+        <div><dt>Score</dt><dd id="score">0</dd></div>
+        <div><dt>Best</dt><dd id="best">0</dd></div>
+      </dl>
+    </header>
+
+    <div class="board" id="board">
+      <canvas id="canvas" aria-label="Snake game board"></canvas>
+      <div class="overlay" id="overlay">
+        <p id="message" role="status"></p>
+        <button id="play" type="button">Play</button>
+      </div>
+    </div>
+
+    <p class="hint">
+      <span class="hint-keys">Steer with the arrow keys or WASD.</span>
+      <span class="hint-touch">Swipe on the board to steer.</span>
+    </p>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
